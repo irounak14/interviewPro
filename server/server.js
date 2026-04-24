@@ -13,6 +13,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 app.options('*', cors());
+app.use(express.json())
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/interview', require('./routes/interview'));
