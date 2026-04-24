@@ -8,10 +8,11 @@ const app = express();
 // Middleware
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://interview-pro-zeta.vercel.app/'],
-  credentials: true
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
-app.use(express.json());
+app.options('*', cors());
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/interview', require('./routes/interview'));
