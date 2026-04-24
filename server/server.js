@@ -8,8 +8,8 @@ const app = express();
 // Middleware
 // Middleware
 app.use(cors({
-  origin: '*',
-  credentials: false
+  origin: ['http://localhost:5173', 'https://interview-pro-zeta.vercel.app/'],
+  credentials: true
 }));
 app.use(express.json());
 // Routes
