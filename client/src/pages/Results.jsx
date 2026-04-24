@@ -11,7 +11,7 @@ export default function Results() {
   const user = JSON.parse(localStorage.getItem('user'))
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/interview/session/${sessionId}`, {
+    axios.get(`https://interviewpro-api.onrender.com/api/interview/session/${sessionId}`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then(res => {
       setSession(res.data)

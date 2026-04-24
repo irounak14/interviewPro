@@ -19,7 +19,7 @@ export default function HRLogin() {
         ? { ...form, role: 'hr' }
         : { email: form.email, password: form.password }
 
-      const res = await axios.post(`http://localhost:5000/api/auth/${endpoint}`, payload)
+      const res = await axios.post(`https://interviewpro-api.onrender.com/api/auth/${endpoint}`, payload)
 
       localStorage.setItem('token', res.data.token)
       localStorage.setItem('user', JSON.stringify(res.data.user))

@@ -10,7 +10,7 @@ export default function History() {
   const user = JSON.parse(localStorage.getItem('user'))
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/interview/my-sessions', {
+    axios.get('https://interviewpro-api.onrender.com/api/interview/my-sessions', {
       headers: { Authorization: `Bearer ${token}` }
     }).then(res => {
       setSessions(res.data)

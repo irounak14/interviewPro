@@ -26,7 +26,7 @@ export default function HRPortal() {
   const fetchCandidates = async () => {
     setLoading(true)
     try {
-      const res = await axios.get(`http://localhost:5000/api/hr/candidates?subject=${filter}`, {
+      const res = await axios.get(`https://interviewpro-api.onrender.com/api/hr/candidates?subject=${filter}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       setCandidates(res.data)
@@ -38,7 +38,7 @@ export default function HRPortal() {
 
   const toggleSave = async (candidateId) => {
     try {
-      const res = await axios.post(`http://localhost:5000/api/hr/save/${candidateId}`, {}, {
+      const res = await axios.post(`https://interviewpro-api.onrender.com/api/hr/save/${candidateId}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       })
       if (res.data.saved) {

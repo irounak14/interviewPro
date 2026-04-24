@@ -23,7 +23,7 @@ export default function Interview() {
 
   // Fetch questions
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/interview/questions/${subject}`, {
+    axios.get(`https://interviewpro-api.onrender.com/api/interview/questions/${subject}`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then(res => setQuestions(res.data))
       .catch(() => navigate('/candidate/subjects'))
@@ -89,7 +89,7 @@ export default function Interview() {
     const q = questions[current]
 
     try {
-      const res = await axios.post('http://localhost:5000/api/interview/evaluate', {
+      const res = await axios.post('https://interviewpro-api.onrender.com/api/interview/evaluate', {
         question: q.question,
         answer: transcript || '',
         subject,
@@ -117,7 +117,7 @@ export default function Interview() {
     if (current + 1 >= questions.length) {
       // Save session
       try {
-        const res = await axios.post('http://localhost:5000/api/interview/session', {
+        const res = await axios.post('https://interviewpro-api.onrender.com/api/interview/session', {
           subject, answers
         }, { headers: { Authorization: `Bearer ${token}` } })
         navigate(`/candidate/results/${res.data.sessionId}`)
