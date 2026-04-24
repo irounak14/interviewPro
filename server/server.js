@@ -6,10 +6,13 @@ require('dotenv').config();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://your-app.vercel.app'],
+  credentials: true
+}));
 app.use(express.json());
 
-// Routes (we'll add these next)
+// Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/interview', require('./routes/interview'));
 app.use('/api/hr', require('./routes/hr'));
