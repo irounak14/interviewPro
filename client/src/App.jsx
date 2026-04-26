@@ -7,6 +7,7 @@ import Interview from './pages/Interview'
 import Results from './pages/Results'
 import History from './pages/History'
 import HRPortal from './pages/HRPortal'
+import Profile from './pages/Profile'
 function App() {
   return (
     <div className="min-h-screen bg-[#0f0f0f] text-white">
@@ -19,6 +20,7 @@ function App() {
         <Route path="/candidate/results/:sessionId" element={<Results />} />
         <Route path="/candidate/history" element={<History />} />
         <Route path="/hr/portal" element={<HRPortal />} />
+        <Route path="/candidate/profile" element={<Profile />} />
       </Routes>
     </div>
   )

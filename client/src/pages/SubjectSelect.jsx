@@ -47,6 +47,12 @@ export default function SubjectSelect() {
       </div>
 
       {/* Navbar */}
+      <button
+  onClick={() => navigate('/candidate/profile')}
+  className="px-4 py-2 rounded-lg text-sm border border-white/10 text-zinc-400 hover:text-white transition-all">
+  My Profile
+</button>
+
       <header className="sticky top-0 w-full z-50 border-b border-white/10"
         style={{ background: 'rgba(9,9,11,0.8)', backdropFilter: 'blur(20px)' }}>
         <div className="flex justify-between items-center max-w-7xl mx-auto px-8 h-20">
