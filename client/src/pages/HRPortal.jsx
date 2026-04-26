@@ -12,6 +12,8 @@ export default function HRPortal() {
   const [savedCount, setSavedCount] = useState(0)
   const [showSaved, setShowSaved] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [inviteSent, setInviteSent] = useState({})
+  const [inviteLoading, setInviteLoading] = useState({})
   const token = localStorage.getItem('token')
   const user = JSON.parse(localStorage.getItem('user'))
 
@@ -42,6 +44,20 @@ export default function HRPortal() {
     } catch (err) { console.error(err) }
   }
 
+  const sendInvite = async (candidateId) => {
+    setInviteLoading(prev => ({ ...prev, [candidateId]: true }))
+    try {
+      await axios.post(`https://interviewpro-api.onrender.com/api/hr/invite/${candidateId}`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      setInviteSent(prev => ({ ...prev, [candidateId]: true }))
+    } catch (err) {
+      console.error(err)
+      alert('Failed to send invite. Please try again.')
+    }
+    setInviteLoading(prev => ({ ...prev, [candidateId]: false }))
+  }
+
   const getScoreColor = (score) => {
     if (score >= 70) return '#4ade80'
     if (score >= 40) return '#facc15'
@@ -49,7 +65,6 @@ export default function HRPortal() {
   }
 
   const getInitials = (name) => name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
-
   const avatarColors = ['#7c3aed', '#0d9488', '#ef4444', '#f59e0b', '#3b82f6', '#ec4899']
 
   return (
@@ -75,8 +90,7 @@ export default function HRPortal() {
             InterviewPro
           </div>
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => setShowSaved(false)}
+            <button onClick={() => setShowSaved(false)}
               className="px-4 py-2 rounded-lg text-sm font-medium transition-all border"
               style={!showSaved ? {
                 background: 'rgba(13,148,136,0.15)',
@@ -88,8 +102,7 @@ export default function HRPortal() {
               }}>
               Discover Talent
             </button>
-            <button
-              onClick={() => setShowSaved(true)}
+            <button onClick={() => setShowSaved(true)}
               className="px-4 py-2 rounded-lg text-sm font-medium transition-all border flex items-center gap-2"
               style={showSaved ? {
                 background: 'rgba(13,148,136,0.15)',
@@ -107,8 +120,7 @@ export default function HRPortal() {
                 </span>
               )}
             </button>
-            <button
-              onClick={() => { localStorage.clear(); navigate('/') }}
+            <button onClick={() => { localStorage.clear(); navigate('/') }}
               className="px-4 py-2 rounded-lg text-sm border border-red-900/50 text-red-400 hover:bg-red-900/20 transition-all">
               Exit
             </button>
@@ -120,7 +132,6 @@ export default function HRPortal() {
 
         {!showSaved ? (
           <>
-            {/* Header */}
             <div className="mb-8">
               <p className="text-xs uppercase tracking-widest text-teal-400 mb-2">HR Portal</p>
               <h2 className="text-4xl font-bold text-white mb-2">Talent Discovery</h2>
@@ -146,7 +157,7 @@ export default function HRPortal() {
               ))}
             </div>
 
-            {/* Candidates */}
+            {/* Candidates List */}
             {loading ? (
               <div className="flex items-center justify-center py-20">
                 <div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
@@ -159,8 +170,7 @@ export default function HRPortal() {
             ) : (
               <div className="flex flex-col gap-4">
                 {candidates.map((c, i) => (
-                  <div key={c._id}
-                    className="rounded-xl p-6 transition-all hover:border-white/15"
+                  <div key={c._id} className="rounded-xl p-6 transition-all hover:border-white/15"
                     style={{
                       background: 'rgba(26,26,26,0.6)',
                       backdropFilter: 'blur(20px)',
@@ -168,9 +178,11 @@ export default function HRPortal() {
                     }}>
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-4">
-                        {/* Avatar */}
                         <div className="w-14 h-14 rounded-xl flex items-center justify-center text-white font-bold text-lg flex-shrink-0"
-                          style={{ background: `${avatarColors[i % avatarColors.length]}30`, border: `1px solid ${avatarColors[i % avatarColors.length]}40` }}>
+                          style={{
+                            background: `${avatarColors[i % avatarColors.length]}30`,
+                            border: `1px solid ${avatarColors[i % avatarColors.length]}40`
+                          }}>
                           <span style={{ color: avatarColors[i % avatarColors.length] }}>
                             {getInitials(c.name)}
                           </span>
@@ -181,117 +193,9 @@ export default function HRPortal() {
                             <p className="font-bold text-white text-lg">{c.name}</p>
                             {c.avgScore >= 75 && (
                               <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
-                                style={{ background: 'rgba(245,158,11,0.15)', color: '#fbbf24', border: '1px solid rgba(245,158,11,0.3)' }}>
+                                style={{
+                                  background: 'rgba(245,158,11,0.15)',
+                                  color: '#fbbf24',
+                                  border: '1px solid rgba(245,158,11,0.3)'
+                                }}>
                                 ⭐ Top Performer
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="flex items-center gap-2 flex-wrap">
-                            {c.skills.map(skill => (
-                              <span key={skill}
-                                className="text-xs px-2 py-0.5 rounded-full uppercase font-semibold"
-                                style={{ background: 'rgba(255,255,255,0.05)', color: '#71717a', border: '1px solid rgba(255,255,255,0.08)' }}>
-                                {skill}
-                              </span>
-                            ))}
-                            {c.location && (
-                              <span className="text-xs text-zinc-500 flex items-center gap-1">
-                                <span className="material-symbols-outlined text-xs"
-                                  style={{ fontFamily: 'Material Symbols Outlined' }}>location_on</span>
-                                {c.location}
-                              </span>
-                            )}
-                            <span className="text-xs text-zinc-600">· {c.totalSessions} sessions</span>
-                          </div>
-
-                          {c.openToWork && (
-                            <div className="flex items-center gap-1.5 mt-2">
-                              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                              <span className="text-xs text-green-400 font-semibold">Open to work</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Score */}
-                      <div className="text-right flex-shrink-0">
-                        <p className="text-4xl font-bold" style={{ color: getScoreColor(c.avgScore) }}>
-                          {c.avgScore}
-                        </p>
-                        <p className="text-zinc-600 text-xs">avg score</p>
-                      </div>
-                    </div>
-
-                    {/* Score bar */}
-                    <div className="mt-4 mb-4">
-                      <div className="w-full bg-white/5 rounded-full h-1">
-                        <div className="h-1 rounded-full transition-all"
-                          style={{ width: `${c.avgScore}%`, background: getScoreColor(c.avgScore) }} />
-                      </div>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex gap-3 pt-4 border-t border-white/5">
-                      <button
-                        onClick={() => toggleSave(c._id)}
-                        className="px-4 py-2 rounded-lg text-sm font-semibold border transition-all flex items-center gap-2"
-                        style={savedIds.includes(c._id) ? {
-                          background: 'rgba(13,148,136,0.15)',
-                          borderColor: 'rgba(13,148,136,0.4)',
-                          color: '#6bd8cb'
-                        } : {
-                          borderColor: 'rgba(255,255,255,0.1)',
-                          color: '#71717a'
-                        }}>
-                        <span className="material-symbols-outlined text-sm"
-                          style={{ fontFamily: 'Material Symbols Outlined' }}>
-                          {savedIds.includes(c._id) ? 'bookmark_added' : 'bookmark'}
-                        </span>
-                        {savedIds.includes(c._id) ? 'Saved' : 'Save'}
-                      </button>
-                      <button
-                        className="flex-1 py-2 rounded-lg text-sm font-semibold text-white border border-white/10 hover:border-teal-500/50 hover:text-teal-300 transition-all flex items-center justify-center gap-2">
-                        <span className="material-symbols-outlined text-sm"
-                          style={{ fontFamily: 'Material Symbols Outlined' }}>mail</span>
-                        Send Interview Invite
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </>
-        ) : (
-          <>
-            <div className="mb-8">
-              <p className="text-xs uppercase tracking-widest text-teal-400 mb-2">HR Portal</p>
-              <h2 className="text-4xl font-bold text-white mb-2">Saved Candidates</h2>
-              <p className="text-zinc-400">Candidates you've bookmarked for later</p>
-            </div>
-            {savedIds.length === 0 ? (
-              <div className="text-center py-20">
-                <p className="text-5xl mb-4">🔖</p>
-                <p className="text-zinc-400 mb-6">No saved candidates yet.</p>
-                <button onClick={() => setShowSaved(false)}
-                  className="px-6 py-3 rounded-xl text-white font-semibold transition-all"
-                  style={{ background: '#0d9488' }}>
-                  Discover Talent
-                </button>
-              </div>
-            ) : (
-              <p className="text-zinc-400">Your saved candidates appear here.</p>
-            )}
-          </>
-        )}
-      </main>
-
-      <footer className="w-full py-6 border-t border-white/5 relative z-10" style={{ background: '#09090b' }}>
-        <div className="flex justify-between items-center max-w-7xl mx-auto px-8">
-          <div className="text-xs font-bold text-white uppercase tracking-tighter">InterviewPro</div>
-          <div className="text-xs text-zinc-600">© 2026 InterviewPro</div>
-        </div>
-      </footer>
-    </div>
-  )
-}
