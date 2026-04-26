@@ -1,19 +1,26 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import ReCAPTCHA from 'react-google-recaptcha'
 
 export default function CandidateLogin() {
   const navigate = useNavigate()
   const [isRegister, setIsRegister] = useState(false)
   const [error, setError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [captchaVerified, setCaptchaVerified] = useState(false)
   const [form, setForm] = useState({ name: '', email: '', password: '', location: '' })
+  const recaptchaRef = useRef(null)
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    if (!captchaVerified) {
+      setError('Please verify you are not a robot.')
+      return
+    }
     try {
       const endpoint = isRegister ? 'register' : 'login'
       const payload = isRegister
@@ -26,6 +33,8 @@ export default function CandidateLogin() {
       navigate('/candidate/subjects')
     } catch (err) {
       setError(err.response?.data?.msg || 'Something went wrong')
+      recaptchaRef.current?.reset()
+      setCaptchaVerified(false)
     }
   }
 
@@ -33,7 +42,6 @@ export default function CandidateLogin() {
     <div className="min-h-screen bg-[#131313] text-white flex flex-col"
       style={{ fontFamily: 'Manrope, sans-serif' }}>
 
-      {/* Google Fonts */}
       <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 
@@ -49,10 +57,8 @@ export default function CandidateLogin() {
       <header className="sticky top-0 w-full z-50 border-b border-white/10"
         style={{ background: 'rgba(9,9,11,0.8)', backdropFilter: 'blur(20px)' }}>
         <div className="flex justify-between items-center max-w-7xl mx-auto px-8 h-20">
-          <div
-            onClick={() => navigate('/')}
-            className="text-xl font-bold tracking-tighter text-white uppercase cursor-pointer"
-          >
+          <div onClick={() => navigate('/')}
+            className="text-xl font-bold tracking-tighter text-white uppercase cursor-pointer">
             InterviewPro
           </div>
           <div className="flex items-center gap-4">
@@ -103,21 +109,14 @@ export default function CandidateLogin() {
                   <label className="text-xs font-semibold text-zinc-300 ml-1 uppercase tracking-wider">
                     Full Name
                   </label>
-                  <div className="relative group">
+                  <div className="relative">
                     <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-xl"
-                      style={{ fontFamily: 'Material Symbols Outlined' }}>
-                      person
-                    </span>
-                    <input
-                      name="name" placeholder="John Doe"
+                      style={{ fontFamily: 'Material Symbols Outlined' }}>person</span>
+                    <input name="name" placeholder="John Doe"
                       value={form.name} onChange={handleChange}
                       className="w-full rounded-lg py-3.5 pl-12 pr-4 text-white placeholder-zinc-600 focus:outline-none transition-all"
-                      style={{
-                        background: 'rgba(39,39,42,0.5)',
-                        border: '1px solid rgba(255,255,255,0.1)'
-                      }}
-                      required
-                    />
+                      style={{ background: 'rgba(39,39,42,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}
+                      required />
                   </div>
                 </div>
               )}
@@ -126,21 +125,14 @@ export default function CandidateLogin() {
                 <label className="text-xs font-semibold text-zinc-300 ml-1 uppercase tracking-wider">
                   Email Address
                 </label>
-                <div className="relative group">
+                <div className="relative">
                   <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-xl"
-                    style={{ fontFamily: 'Material Symbols Outlined' }}>
-                    mail
-                  </span>
-                  <input
-                    name="email" type="email" placeholder="name@company.com"
+                    style={{ fontFamily: 'Material Symbols Outlined' }}>mail</span>
+                  <input name="email" type="email" placeholder="name@company.com"
                     value={form.email} onChange={handleChange}
                     className="w-full rounded-lg py-3.5 pl-12 pr-4 text-white placeholder-zinc-600 focus:outline-none transition-all"
-                    style={{
-                      background: 'rgba(39,39,42,0.5)',
-                      border: '1px solid rgba(255,255,255,0.1)'
-                    }}
-                    required
-                  />
+                    style={{ background: 'rgba(39,39,42,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}
+                    required />
                 </div>
               </div>
 
@@ -148,28 +140,18 @@ export default function CandidateLogin() {
                 <label className="text-xs font-semibold text-zinc-300 ml-1 uppercase tracking-wider">
                   Password
                 </label>
-                <div className="relative group">
+                <div className="relative">
                   <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-xl"
-                    style={{ fontFamily: 'Material Symbols Outlined' }}>
-                    lock
-                  </span>
-                  <input
-                    name="password"
+                    style={{ fontFamily: 'Material Symbols Outlined' }}>lock</span>
+                  <input name="password"
                     type={showPassword ? 'text' : 'password'}
                     placeholder="••••••••"
                     value={form.password} onChange={handleChange}
                     className="w-full rounded-lg py-3.5 pl-12 pr-12 text-white placeholder-zinc-600 focus:outline-none transition-all"
-                    style={{
-                      background: 'rgba(39,39,42,0.5)',
-                      border: '1px solid rgba(255,255,255,0.1)'
-                    }}
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition-colors"
-                  >
+                    style={{ background: 'rgba(39,39,42,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}
+                    required />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition-colors">
                     <span className="material-symbols-outlined text-xl"
                       style={{ fontFamily: 'Material Symbols Outlined' }}>
                       {showPassword ? 'visibility_off' : 'visibility'}
@@ -183,37 +165,41 @@ export default function CandidateLogin() {
                   <label className="text-xs font-semibold text-zinc-300 ml-1 uppercase tracking-wider">
                     City
                   </label>
-                  <div className="relative group">
+                  <div className="relative">
                     <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-xl"
-                      style={{ fontFamily: 'Material Symbols Outlined' }}>
-                      location_on
-                    </span>
-                    <input
-                      name="location" placeholder="e.g. Delhi"
+                      style={{ fontFamily: 'Material Symbols Outlined' }}>location_on</span>
+                    <input name="location" placeholder="e.g. Delhi"
                       value={form.location} onChange={handleChange}
                       className="w-full rounded-lg py-3.5 pl-12 pr-4 text-white placeholder-zinc-600 focus:outline-none transition-all"
-                      style={{
-                        background: 'rgba(39,39,42,0.5)',
-                        border: '1px solid rgba(255,255,255,0.1)'
-                      }}
-                    />
+                      style={{ background: 'rgba(39,39,42,0.5)', border: '1px solid rgba(255,255,255,0.1)' }} />
                   </div>
                 </div>
               )}
 
-              <button
-                type="submit"
-                className="w-full py-4 text-white font-semibold uppercase tracking-widest rounded-lg transition-all active:scale-95 mt-2 flex items-center justify-center gap-2"
-                style={{
+              {/* reCAPTCHA */}
+              <div className="flex justify-center">
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                  theme="dark"
+                  onChange={(token) => setCaptchaVerified(!!token)}
+                  onExpired={() => setCaptchaVerified(false)}
+                />
+              </div>
+
+              <button type="submit"
+                disabled={!captchaVerified}
+                className="w-full py-4 text-white font-semibold uppercase tracking-widest rounded-lg transition-all active:scale-95 flex items-center justify-center gap-2"
+                style={captchaVerified ? {
                   background: '#7c3aed',
                   boxShadow: '0 4px 20px rgba(124,58,237,0.4)'
-                }}
-              >
+                } : {
+                  background: 'rgba(124,58,237,0.3)',
+                  cursor: 'not-allowed'
+                }}>
                 {isRegister ? 'Create Account' : 'Login'}
                 <span className="material-symbols-outlined text-sm"
-                  style={{ fontFamily: 'Material Symbols Outlined' }}>
-                  arrow_forward
-                </span>
+                  style={{ fontFamily: 'Material Symbols Outlined' }}>arrow_forward</span>
               </button>
             </form>
 
@@ -221,9 +207,8 @@ export default function CandidateLogin() {
             <p className="text-center text-zinc-500 text-sm">
               {isRegister ? 'Already have an account?' : "Don't have an account yet?"}
               <span
-                onClick={() => { setIsRegister(!isRegister); setError('') }}
-                className="text-violet-400 hover:text-violet-300 font-semibold ml-1 cursor-pointer transition-colors"
-              >
+                onClick={() => { setIsRegister(!isRegister); setError(''); setCaptchaVerified(false); recaptchaRef.current?.reset() }}
+                className="text-violet-400 hover:text-violet-300 font-semibold ml-1 cursor-pointer transition-colors">
                 {isRegister ? 'Sign in' : 'Register for free'}
               </span>
             </p>
@@ -244,12 +229,9 @@ export default function CandidateLogin() {
               </a>
             ))}
           </div>
-          <div className="text-xs text-zinc-500 uppercase tracking-wide">
-            © 2024 InterviewPro
-          </div>
+          <div className="text-xs text-zinc-500 uppercase tracking-wide">© 2026 InterviewPro</div>
         </div>
       </footer>
-
     </div>
   )
 }

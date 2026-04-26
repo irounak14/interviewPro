@@ -163,7 +163,7 @@ export default function SubjectSelect() {
         style={{ background: '#09090b' }}>
         <div className="flex justify-between items-center max-w-7xl mx-auto px-8">
           <div className="text-xs font-bold text-white uppercase tracking-tighter">InterviewPro</div>
-          <div className="text-xs text-zinc-600">© 2024 InterviewPro</div>
+          <div className="text-xs text-zinc-600">© 2026 InterviewPro</div>
         </div>
       </footer>
 

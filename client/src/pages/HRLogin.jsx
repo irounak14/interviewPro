@@ -1,19 +1,26 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import ReCAPTCHA from 'react-google-recaptcha'
 
 export default function HRLogin() {
   const navigate = useNavigate()
   const [isRegister, setIsRegister] = useState(false)
   const [error, setError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [captchaVerified, setCaptchaVerified] = useState(false)
   const [form, setForm] = useState({ name: '', email: '', password: '' })
+  const recaptchaRef = useRef(null)
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    if (!captchaVerified) {
+      setError('Please verify you are not a robot.')
+      return
+    }
     try {
       const endpoint = isRegister ? 'register' : 'login'
       const payload = isRegister
@@ -26,6 +33,8 @@ export default function HRLogin() {
       navigate('/hr/portal')
     } catch (err) {
       setError(err.response?.data?.msg || 'Something went wrong')
+      recaptchaRef.current?.reset()
+      setCaptchaVerified(false)
     }
   }
 
@@ -145,9 +154,27 @@ export default function HRLogin() {
                 </div>
               </div>
 
+              {/* reCAPTCHA */}
+              <div className="flex justify-center">
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                  theme="dark"
+                  onChange={(token) => setCaptchaVerified(!!token)}
+                  onExpired={() => setCaptchaVerified(false)}
+                />
+              </div>
+
               <button type="submit"
-                className="w-full py-4 text-white font-semibold uppercase tracking-widest rounded-lg transition-all active:scale-95 mt-2 flex items-center justify-center gap-2"
-                style={{ background: '#0d9488', boxShadow: '0 4px 20px rgba(13,148,136,0.4)' }}>
+                disabled={!captchaVerified}
+                className="w-full py-4 text-white font-semibold uppercase tracking-widest rounded-lg transition-all active:scale-95 flex items-center justify-center gap-2"
+                style={captchaVerified ? {
+                  background: '#0d9488',
+                  boxShadow: '0 4px 20px rgba(13,148,136,0.4)'
+                } : {
+                  background: 'rgba(13,148,136,0.3)',
+                  cursor: 'not-allowed'
+                }}>
                 {isRegister ? 'Create Account' : 'Login'}
                 <span className="material-symbols-outlined text-sm"
                   style={{ fontFamily: 'Material Symbols Outlined' }}>arrow_forward</span>
@@ -156,7 +183,8 @@ export default function HRLogin() {
 
             <p className="text-center text-zinc-500 text-sm">
               {isRegister ? 'Already have an account?' : "New HR account?"}
-              <span onClick={() => { setIsRegister(!isRegister); setError('') }}
+              <span
+                onClick={() => { setIsRegister(!isRegister); setError(''); setCaptchaVerified(false); recaptchaRef.current?.reset() }}
                 className="font-semibold ml-1 cursor-pointer transition-colors"
                 style={{ color: '#6bd8cb' }}>
                 {isRegister ? 'Sign in' : 'Register for free'}
@@ -177,7 +205,7 @@ export default function HRLogin() {
               </a>
             ))}
           </div>
-          <div className="text-xs text-zinc-500 uppercase tracking-wide">© 2024 InterviewPro</div>
+          <div className="text-xs text-zinc-500 uppercase tracking-wide">© 2026 InterviewPro</div>
         </div>
       </footer>
     </div>
