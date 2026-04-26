@@ -1,7 +1,101 @@
 import { useNavigate } from 'react-router-dom'
+import { useEffect, useRef } from 'react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+gsap.registerPlugin(ScrollTrigger)
 
 export default function Landing() {
   const navigate = useNavigate()
+
+  // Refs
+  const navRef = useRef(null)
+  const badgeRef = useRef(null)
+  const headingRef = useRef(null)
+  const subRef = useRef(null)
+  const cardsRef = useRef(null)
+  const statsRef = useRef(null)
+  const featuresRef = useRef(null)
+  const subjectsRef = useRef(null)
+  const ctaRef = useRef(null)
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+
+      // Navbar fade in
+      gsap.fromTo(navRef.current,
+        { y: -60, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' }
+      )
+
+      // Hero timeline
+      const tl = gsap.timeline({ delay: 0.3 })
+
+      tl.fromTo(badgeRef.current,
+        { y: 30, opacity: 0, scale: 0.9 },
+        { y: 0, opacity: 1, scale: 1, duration: 0.6, ease: 'back.out(1.7)' }
+      )
+      .fromTo(headingRef.current,
+        { y: 50, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' },
+        '-=0.3'
+      )
+      .fromTo(subRef.current,
+        { y: 30, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out' },
+        '-=0.4'
+      )
+      .fromTo(cardsRef.current.children,
+        { y: 40, opacity: 0, scale: 0.95 },
+        { y: 0, opacity: 1, scale: 1, duration: 0.6, stagger: 0.15, ease: 'power3.out' },
+        '-=0.3'
+      )
+      .fromTo(statsRef.current.children,
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5, stagger: 0.1, ease: 'power2.out' },
+        '-=0.2'
+      )
+
+      // Features scroll animation
+      gsap.fromTo(featuresRef.current.children,
+        { y: 60, opacity: 0 },
+        {
+          y: 0, opacity: 1, duration: 0.7, stagger: 0.15, ease: 'power3.out',
+          scrollTrigger: {
+            trigger: featuresRef.current,
+            start: 'top 80%',
+          }
+        }
+      )
+
+      // Subjects scroll animation
+      gsap.fromTo(subjectsRef.current.children,
+        { scale: 0.8, opacity: 0 },
+        {
+          scale: 1, opacity: 1, duration: 0.4, stagger: 0.05, ease: 'back.out(1.4)',
+          scrollTrigger: {
+            trigger: subjectsRef.current,
+            start: 'top 80%',
+          }
+        }
+      )
+
+      // CTA scroll animation
+      gsap.fromTo(ctaRef.current,
+        { y: 50, opacity: 0, scale: 0.95 },
+        {
+          y: 0, opacity: 1, scale: 1, duration: 0.8, ease: 'power3.out',
+          scrollTrigger: {
+            trigger: ctaRef.current,
+            start: 'top 85%',
+          }
+        }
+      )
+
+    })
+
+    return () => ctx.revert()
+  }, [])
 
   return (
     <div className="min-h-screen bg-[#131313] text-white flex flex-col"
@@ -21,8 +115,8 @@ export default function Landing() {
       </div>
 
       {/* Navbar */}
-      <header className="sticky top-0 w-full z-50 border-b border-white/10"
-        style={{ background: 'rgba(9,9,11,0.8)', backdropFilter: 'blur(20px)' }}>
+      <header ref={navRef} className="sticky top-0 w-full z-50 border-b border-white/10"
+        style={{ background: 'rgba(9,9,11,0.8)', backdropFilter: 'blur(20px)', opacity: 0 }}>
         <div className="flex justify-between items-center max-w-7xl mx-auto px-8 h-20">
           <div className="text-xl font-bold tracking-tighter text-white uppercase">
             InterviewPro
@@ -33,13 +127,11 @@ export default function Landing() {
             <a href="#stats" className="text-zinc-400 hover:text-white transition-colors">Stats</a>
           </nav>
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate('/candidate/login')}
+            <button onClick={() => navigate('/candidate/login')}
               className="px-4 py-2 rounded-lg text-sm text-zinc-400 hover:text-white border border-white/10 hover:border-white/20 transition-all">
               Sign In
             </button>
-            <button
-              onClick={() => navigate('/candidate/login')}
+            <button onClick={() => navigate('/candidate/login')}
               className="px-5 py-2 rounded-lg text-sm text-white font-semibold transition-all active:scale-95"
               style={{ background: '#7c3aed', boxShadow: '0 4px 15px rgba(124,58,237,0.3)' }}>
               Get Started
@@ -48,15 +140,18 @@ export default function Landing() {
         </div>
       </header>
 
-      {/* Hero Section */}
+      {/* Hero */}
       <section className="relative z-10 flex flex-col items-center justify-center text-center px-6 pt-24 pb-20">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider mb-8 border border-white/10"
+
+        <div ref={badgeRef} style={{ opacity: 0 }}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider mb-8 border border-white/10"
           style={{ background: 'rgba(124,58,237,0.1)', color: '#a78bfa' }}>
           <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
           Powered by Groq AI — Real-time Evaluation
         </div>
 
-        <h1 className="text-6xl md:text-7xl font-bold tracking-tight mb-6 max-w-4xl leading-tight">
+        <h1 ref={headingRef} style={{ opacity: 0 }}
+          className="text-6xl md:text-7xl font-bold tracking-tight mb-6 max-w-4xl leading-tight">
           Ace Your Next{' '}
           <span style={{
             background: 'linear-gradient(135deg, #a78bfa, #7c3aed)',
@@ -67,13 +162,14 @@ export default function Landing() {
           </span>
         </h1>
 
-        <p className="text-zinc-400 text-lg max-w-xl mb-10 leading-relaxed">
+        <p ref={subRef} style={{ opacity: 0 }}
+          className="text-zinc-400 text-lg max-w-xl mb-10 leading-relaxed">
           AI-powered mock interviews with real-time voice evaluation.
           Practice, improve, and get noticed by top recruiters.
         </p>
 
         {/* Role Cards */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-16 w-full max-w-2xl">
+        <div ref={cardsRef} className="flex flex-col sm:flex-row gap-4 mb-16 w-full max-w-2xl">
           <div
             onClick={() => navigate('/candidate/login')}
             className="flex-1 cursor-pointer rounded-xl p-6 text-left transition-all hover:scale-105 group"
@@ -130,7 +226,8 @@ export default function Landing() {
         </div>
 
         {/* Stats */}
-        <div id="stats" className="flex items-center gap-12 border-t border-white/10 pt-10 w-full max-w-2xl justify-center">
+        <div ref={statsRef} id="stats"
+          className="flex items-center gap-12 border-t border-white/10 pt-10 w-full max-w-2xl justify-center">
           <div className="text-center">
             <p className="text-3xl font-bold text-violet-400">12</p>
             <p className="text-zinc-500 text-xs uppercase tracking-wider mt-1">Subjects</p>
@@ -148,14 +245,14 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Features */}
       <section id="features" className="relative z-10 max-w-7xl mx-auto px-8 py-20">
         <div className="text-center mb-12">
           <p className="text-xs uppercase tracking-widest text-violet-400 mb-3">Why InterviewPro</p>
           <h2 className="text-4xl font-bold text-white">Everything you need to succeed</h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div ref={featuresRef} className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
             {
               icon: 'mic',
@@ -176,11 +273,12 @@ export default function Landing() {
               color: '#f59e0b'
             }
           ].map((f, i) => (
-            <div key={i} className="rounded-xl p-8 transition-all hover:border-white/20"
+            <div key={i} className="rounded-xl p-8 transition-all hover:border-white/20 hover:-translate-y-1"
               style={{
                 background: 'rgba(26,26,26,0.6)',
                 backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255,255,255,0.08)'
+                border: '1px solid rgba(255,255,255,0.08)',
+                transition: 'transform 0.3s ease, border-color 0.3s ease'
               }}>
               <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-6"
                 style={{ background: `${f.color}20` }}>
@@ -196,14 +294,14 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Subjects Section */}
+      {/* Subjects */}
       <section id="subjects" className="relative z-10 max-w-7xl mx-auto px-8 py-20">
         <div className="text-center mb-12">
           <p className="text-xs uppercase tracking-widest text-violet-400 mb-3">12 Subjects</p>
           <h2 className="text-4xl font-bold text-white">Practice any CS topic</h2>
         </div>
 
-        <div className="flex flex-wrap gap-3 justify-center">
+        <div ref={subjectsRef} className="flex flex-wrap gap-3 justify-center">
           {[
             { name: 'DSA', icon: '🌲' },
             { name: 'Operating Systems', icon: '⚙️' },
@@ -219,7 +317,7 @@ export default function Landing() {
             { name: 'Web Dev', icon: '🌍' },
           ].map((s, i) => (
             <div key={i}
-              className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-zinc-300 border border-white/10 hover:border-violet-500/50 hover:text-white transition-all cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-zinc-300 border border-white/10 hover:border-violet-500/50 hover:text-white transition-all cursor-pointer hover:scale-105"
               style={{ background: 'rgba(26,26,26,0.6)' }}
               onClick={() => navigate('/candidate/login')}>
               <span>{s.icon}</span>
@@ -229,9 +327,9 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* CTA */}
       <section className="relative z-10 max-w-4xl mx-auto px-8 py-20 text-center">
-        <div className="rounded-2xl p-12"
+        <div ref={ctaRef} className="rounded-2xl p-12"
           style={{
             background: 'rgba(124,58,237,0.1)',
             border: '1px solid rgba(124,58,237,0.3)',
@@ -241,9 +339,9 @@ export default function Landing() {
           <p className="text-zinc-400 mb-8">Join thousands of candidates practicing with AI-powered mock interviews.</p>
           <button
             onClick={() => navigate('/candidate/login')}
-            className="px-8 py-4 rounded-xl text-white font-bold text-lg transition-all active:scale-95"
+            className="px-8 py-4 rounded-xl text-white font-bold text-lg transition-all active:scale-95 hover:scale-105"
             style={{ background: '#7c3aed', boxShadow: '0 4px 30px rgba(124,58,237,0.4)' }}>
-            Start for Free →
+            Start for Free
           </button>
         </div>
       </section>
@@ -262,7 +360,7 @@ export default function Landing() {
             ))}
           </div>
           <div className="text-xs text-zinc-500 uppercase tracking-wide">
-            © 2026 InterviewPro
+            2024 InterviewPro
           </div>
         </div>
       </footer>
