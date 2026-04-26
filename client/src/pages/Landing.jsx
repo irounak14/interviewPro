@@ -262,7 +262,7 @@ export default function Landing() {
             ))}
           </div>
           <div className="text-xs text-zinc-500 uppercase tracking-wide">
-            © 2024 InterviewPro
+            © 2026 InterviewPro
           </div>
         </div>
       </footer>
