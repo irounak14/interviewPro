@@ -86,32 +86,41 @@ router.put('/profile', authMiddleware, async (req, res) => {
 
 // GOOGLE OAuth - initiate
 router.get('/google', passport.authenticate('google', {
-  scope: ['profile', 'email']
+  scope: ['profile', 'email'],
+  prompt: 'select_account'
 }));
 
 // GOOGLE OAuth - callback
 router.get('/google/callback',
-  passport.authenticate('google', { failureRedirect: `${process.env.CLIENT_URL}/candidate/login` }),
+  passport.authenticate('google', {
+    failureRedirect: `${process.env.CLIENT_URL}/candidate/login`,
+    session: true
+  }),
   (req, res) => {
     try {
+      if (!req.user) {
+        return res.redirect(`${process.env.CLIENT_URL}/candidate/login`)
+      }
+
       const token = jwt.sign(
         { id: req.user._id, role: req.user.role },
         process.env.JWT_SECRET,
         { expiresIn: '7d' }
-      );
+      )
 
       const user = JSON.stringify({
         id: req.user._id,
         name: req.user.name,
         email: req.user.email,
         role: req.user.role
-      });
+      })
 
-      res.redirect(`${process.env.CLIENT_URL}/auth/callback?token=${token}&user=${encodeURIComponent(user)}`);
+      res.redirect(`${process.env.CLIENT_URL}/auth/callback?token=${token}&user=${encodeURIComponent(user)}`)
     } catch (err) {
-      res.status(500).json({ msg: 'Google auth failed' });
+      console.error('Google callback error:', err)
+      res.redirect(`${process.env.CLIENT_URL}/candidate/login`)
     }
   }
-);
+)
 
 module.exports = router;
