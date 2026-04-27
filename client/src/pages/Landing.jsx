@@ -389,7 +389,7 @@ export default function Landing() {
         <h1 ref={heroTitleRef}
           className="text-7xl md:text-9xl font-black tracking-tighter mb-8 leading-none"
           style={{ perspective: '1000px' }}>
-          Ace Your{' '}
+          Ace Your Interview{' '}
           <span style={{
             background: 'linear-gradient(135deg, #a78bfa 0%, #7c3aed 40%, #ec4899 100%)',
             WebkitBackgroundClip: 'text',
