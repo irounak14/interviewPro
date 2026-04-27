@@ -3,7 +3,22 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 
-const app = express();
+const passport = require("./config/passport");
+const session = require("express-session");
+
+const app = express();   // ✅ FIRST create app
+
+// ✅ THEN use middlewares
+app.use(
+  session({
+    secret: "secret",
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Middleware
 app.use((req, res, next) => {
@@ -16,7 +31,8 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
-// Routes
+// ✅ NOW add routes
+app.use("/auth", require("./routes/auth"));   // 👈 MOVE HERE
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/interview', require('./routes/interview'));
 app.use('/api/hr', require('./routes/hr'));
