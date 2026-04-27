@@ -8,6 +8,7 @@ import Results from './pages/Results'
 import History from './pages/History'
 import HRPortal from './pages/HRPortal'
 import Profile from './pages/Profile'
+import AuthCallback from './pages/AuthCallback'
 function App() {
   return (
     <div className="min-h-screen bg-[#0f0f0f] text-white">
@@ -21,6 +22,7 @@ function App() {
         <Route path="/candidate/history" element={<History />} />
         <Route path="/hr/portal" element={<HRPortal />} />
         <Route path="/candidate/profile" element={<Profile />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
       </Routes>
     </div>
   )
